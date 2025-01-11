@@ -27,7 +27,7 @@ function Exports() {
   const { data: exports, mutate } = useSWR<Export[]>("exports");
 
   useEffect(() => {
-    document.title = "Export - Frigate";
+    document.title = "Export - InTL Hub";
   }, []);
 
   // Search

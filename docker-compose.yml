@@ -5,7 +5,7 @@ services:
     # add groups from host for render, plugdev, video
     group_add:
       - "109" # render
-      - "110" # render
+      - "110" # rendercd
       - "44"  # video
       - "46"  # plugdev
     shm_size: "256mb"
@@ -15,18 +15,18 @@ services:
       # Use target devcontainer-trt for TensorRT dev
       target: devcontainer
     ## Uncomment this block for nvidia gpu support
-    # deploy:
-    #       resources:
-    #           reservations:
-    #               devices:
-    #                   - driver: nvidia
-    #                     count: 1
-    #                     capabilities: [gpu]
+    deploy:
+          resources:
+              reservations:
+                  devices:
+                      - driver: nvidia
+                        count: 1
+                        capabilities: [gpu]
     environment:
-      YOLO_MODELS: ""
+      YOLO_MODELS: yolov7-320
     devices:
       - /dev/bus/usb:/dev/bus/usb
-      # - /dev/dri:/dev/dri # for intel hwaccel, needs to be updated for your hardware
+      - /dev/dri:/dev/dri/renderD128
     volumes:
       - .:/workspace/frigate:cached
       - ./web/dist:/opt/frigate/web:cached

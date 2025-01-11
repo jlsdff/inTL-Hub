@@ -47,11 +47,12 @@ export default function AuthenticationView() {
       });
   }, []);
 
-  const onCreate = async (user: string, password: string) => {
+  const onCreate = async (user: string, password: string, role: string) => {
     try {
       await axios.post("users", {
         username: user,
         password: password,
+        role: role,
       });
       setShowCreate(false);
       mutateUsers((users) => {

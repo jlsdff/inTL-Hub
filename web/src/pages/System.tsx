@@ -31,7 +31,7 @@ function System() {
 
   useEffect(() => {
     if (pageToggle) {
-      document.title = `${capitalizeFirstLetter(pageToggle)} Stats - Frigate`;
+      document.title = `${capitalizeFirstLetter(pageToggle)} Stats - InTL Hub`;
     }
   }, [pageToggle]);
 

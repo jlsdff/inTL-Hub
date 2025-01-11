@@ -76,9 +76,9 @@ export default function Events() {
 
   useEffect(() => {
     if (recording) {
-      document.title = "Recordings - Frigate";
+      document.title = "Recordings - InTL Hub";
     } else {
-      document.title = `Review - Frigate`;
+      document.title = `Review - InTL Hub`;
     }
   }, [recording, severity]);
 

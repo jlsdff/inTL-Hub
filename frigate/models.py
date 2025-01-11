@@ -119,3 +119,11 @@ class User(Model):  # type: ignore[misc]
     username = CharField(null=False, primary_key=True, max_length=30)
     password_hash = CharField(null=False, max_length=120)
     notification_tokens = JSONField()
+    role = CharField(max_length=30, null=True)
+
+
+class Audits(Model):
+    user = TextField()
+    action = CharField(null=True, max_length=50)
+    description = TextField()
+    timestamp = DateTimeField()

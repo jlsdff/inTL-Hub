@@ -120,7 +120,7 @@ export default function Settings() {
   }, [tabsRef, pageToggle]);
 
   useEffect(() => {
-    document.title = "Settings - Frigate";
+    document.title = "Settings - InTL Hub";
   }, []);
 
   return (

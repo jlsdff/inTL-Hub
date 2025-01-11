@@ -32,7 +32,7 @@ function Logs() {
   const tabsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    document.title = `${logService[0].toUpperCase()}${logService.substring(1)} Logs - Frigate`;
+    document.title = `${logService[0].toUpperCase()}${logService.substring(1)} Logs - InTL Hub`;
   }, [logService]);
 
   useEffect(() => {

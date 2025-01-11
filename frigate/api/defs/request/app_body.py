@@ -12,6 +12,7 @@ class AppPutPasswordBody(BaseModel):
 class AppPostUsersBody(BaseModel):
     username: str
     password: str
+    role: str
 
 
 class AppPostLoginBody(BaseModel):

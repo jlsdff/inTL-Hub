@@ -12,8 +12,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.security import OAuth2PasswordBearer
 from joserfc import jwt
 from peewee import DoesNotExist
 from slowapi import Limiter
@@ -31,6 +32,7 @@ from frigate.models import User
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=[Tags.auth])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 class RateLimiter:
@@ -300,9 +302,36 @@ def auth(request: Request):
         return fail_response
 
 
+def decode_jwt_token(token: str, secret: str):
+    try:
+        decoded_token = jwt.decode(token, secret)
+        return decoded_token
+    except Exception as e:
+        logger.error(f"Error decoding JWT token: {e}")
+        return None
+
+
+def currentUser(request: Request, token: str = Depends(oauth2_scheme)):
+    secret = get_jwt_secret()
+    decoded_token = decode_jwt_token(token, secret)
+    if decoded_token is None or "sub" not in decoded_token.claims:
+        raise HTTPException(status_code=401, detail="Invalid or missing JWT token")
+    return decoded_token.claims["sub"]
+
+
+@router.get("/currentUser")
+def get_current_user(request: Request, user: str = Depends(currentUser)):
+    current = User.get(User.username == user)
+    user_data = {"username": current.username, "role": current.role}
+    print(f"current: {user_data}")
+    return JSONResponse(content={"username": user})
+
+
 @router.get("/profile")
 def profile(request: Request):
-    username = request.headers.get("remote-user")
+    username = request.headers.get("user")
+    print(f"headers: {request.headers}")
+    print(f"Received remote-user header: {username}")
     return JSONResponse(content={"username": username})
 
 
@@ -345,7 +374,10 @@ def login(request: Request, body: AppPostLoginBody):
 
 @router.get("/users")
 def get_users():
-    exports = User.select(User.username).order_by(User.username).dicts().iterator()
+    exports = (
+        User.select(User.username, User.role).order_by(User.username).dicts().iterator()
+    )
+    # exports = User.select(User.username).order_by(User.username).dicts().iterator()
     return JSONResponse([e for e in exports])
 
 
@@ -356,16 +388,20 @@ def create_user(request: Request, body: AppPostUsersBody):
     if not re.match("^[A-Za-z0-9._]+$", body.username):
         JSONResponse(content={"message": "Invalid username"}, status_code=400)
 
+    if body.role is None or body.role != "admin" or body.role != "user":
+        JSONResponse(content={"message": "Invalid role"}, status_code=400)
+
     password_hash = hash_password(body.password, iterations=HASH_ITERATIONS)
 
     User.insert(
         {
             User.username: body.username,
             User.password_hash: password_hash,
+            User.role: body.role,
             User.notification_tokens: [],
         }
     ).execute()
-    return JSONResponse(content={"username": body.username})
+    return JSONResponse(content={"username": body.username, "role": body.role})
 
 
 @router.delete("/users/{username}")

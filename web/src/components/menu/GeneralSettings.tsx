@@ -1,7 +1,7 @@
 import {
   LuActivity,
-  LuGithub,
-  LuLifeBuoy,
+  // LuGithub,
+  // LuLifeBuoy,
   LuList,
   LuLogOut,
   LuMoon,
@@ -328,11 +328,11 @@ export default function GeneralSettings({ className }: GeneralSettingsProps) {
                 </Portal>
               </SubItem>
             </DropdownMenuGroup>
-            <DropdownMenuLabel className={isDesktop ? "mt-3" : "mt-1"}>
+            {/* <DropdownMenuLabel className={isDesktop ? "mt-3" : "mt-1"}>
               Help
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <a href="https://docs.frigate.video" target="_blank">
+            <DropdownMenuSeparator /> */}
+            {/* <a href="https://docs.frigate.video" target="_blank">
               <MenuItem
                 className={
                   isDesktop ? "cursor-pointer" : "flex items-center p-2 text-sm"
@@ -356,7 +356,7 @@ export default function GeneralSettings({ className }: GeneralSettingsProps) {
                 <LuGithub className="mr-2 size-4" />
                 <span>GitHub</span>
               </MenuItem>
-            </a>
+            </a> */}
             <DropdownMenuSeparator className={isDesktop ? "mt-3" : "mt-1"} />
             <MenuItem
               className={
@@ -366,7 +366,7 @@ export default function GeneralSettings({ className }: GeneralSettingsProps) {
               onClick={() => setRestartDialogOpen(true)}
             >
               <LuRotateCw className="mr-2 size-4" />
-              <span>Restart Frigate</span>
+              <span>Restart inTL Hub</span>
             </MenuItem>
           </div>
         </Content>

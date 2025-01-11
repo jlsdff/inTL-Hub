@@ -21,7 +21,7 @@ function ConfigEditor() {
   const apiHost = useApiHost();
 
   useEffect(() => {
-    document.title = "Config Editor - Frigate";
+    document.title = "Config Editor - InTL Hub";
   }, []);
 
   const { data: config } = useSWR<string>("config/raw");

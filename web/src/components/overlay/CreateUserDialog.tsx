@@ -20,10 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 type CreateUserOverlayProps = {
   show: boolean;
-  onCreate: (user: string, password: string) => void;
+  onCreate: (user: string, password: string, role: string) => void;
   onCancel: () => void;
 };
 export default function CreateUserDialog({
@@ -41,6 +42,7 @@ export default function CreateUserDialog({
         message: "Username may only include letters, numbers, . or _",
       }),
     password: z.string(),
+    role: z.enum(["User", "Admin"]),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,12 +51,13 @@ export default function CreateUserDialog({
     defaultValues: {
       user: "",
       password: "",
+      role: "User",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    await onCreate(values.user, values.password);
+    await onCreate(values.user, values.password, values.role);
     form.reset();
     setIsLoading(false);
   };
@@ -79,6 +82,30 @@ export default function CreateUserDialog({
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="role"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Role</FormLabel>
+                  <FormControl>
+                    <RadioGroup className="flex flex-row gap-4">
+                      <FormItem>
+                        <FormControl>
+                          <RadioGroupItem value="User" />
+                        </FormControl>
+                        <FormLabel>User</FormLabel>
+                      </FormItem>
+                      <FormItem>
+                        <FormControl>
+                          <RadioGroupItem value="Admin" />
+                        </FormControl>
+                        <FormLabel>Admin</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
                 </FormItem>
               )}
             />
