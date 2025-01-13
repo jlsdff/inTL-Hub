@@ -34,16 +34,16 @@ export function ApiProvider({ children, options }: ApiProviderType) {
           return axios.get(path, { params }).then((res) => res.data);
         },
         onError: (error, _key) => {
-          // if (
-          //   error.response &&
-          //   [401, 302, 307].includes(error.response.status)
-          // ) {
-          //   // redirect to the login page if not already there
-          //   const loginPage = error.response.headers.get("location") ?? "login";
-          //   if (window.location.href !== loginPage) {
-          //     window.location.href = loginPage;
-          //   }
-          // }
+          if (
+            error.response &&
+            [401, 302, 307].includes(error.response.status)
+          ) {
+            // redirect to the login page if not already there
+            const loginPage = error.response.headers.get("location") ?? "login";
+            if (window.location.href !== loginPage) {
+              window.location.href = loginPage;
+            }
+          }
         },
         ...options,
       }}
