@@ -37,16 +37,16 @@ import AuthenticationView from "@/views/settings/AuthenticationView";
 import NotificationView from "@/views/settings/NotificationsSettingsView";
 import SearchSettingsView from "@/views/settings/SearchSettingsView";
 import UiSettingsView from "@/views/settings/UiSettingsView";
+import AuditLogsView from "@/views/settings/AuditLogsView";
 
 const allSettingsViews = [
   "UI settings",
-  "explore settings",
   "camera settings",
   "masks / zones",
   "motion tuner",
   "debug",
   "users",
-  "notifications",
+  "audit logs",
 ] as const;
 type SettingsType = (typeof allSettingsViews)[number];
 
@@ -62,10 +62,10 @@ export default function Settings() {
   const settingsViews = useMemo(() => {
     const views = [...allSettingsViews];
 
-    if (!("Notification" in window) || !window.isSecureContext) {
-      const index = views.indexOf("notifications");
-      views.splice(index, 1);
-    }
+    // if (!("Notification" in window) || !window.isSecureContext) {
+    //   const index = views.indexOf("notifications");
+    //   views.splice(index, 1);
+    // }
 
     return views;
   }, []);
@@ -175,9 +175,6 @@ export default function Settings() {
       </div>
       <div className="mt-2 flex h-full w-full flex-col items-start md:h-dvh md:pb-24">
         {page == "UI settings" && <UiSettingsView />}
-        {page == "explore settings" && (
-          <SearchSettingsView setUnsavedChanges={setUnsavedChanges} />
-        )}
         {page == "debug" && (
           <ObjectSettingsView selectedCamera={selectedCamera} />
         )}
@@ -201,9 +198,7 @@ export default function Settings() {
           />
         )}
         {page == "users" && <AuthenticationView />}
-        {page == "notifications" && (
-          <NotificationView setUnsavedChanges={setUnsavedChanges} />
-        )}
+        {page == 'audit logs' && <AuditLogsView />}
       </div>
       {confirmationDialogOpen && (
         <AlertDialog

@@ -15,6 +15,7 @@ import { Card } from "@/components/ui/card";
 import { HiTrash } from "react-icons/hi";
 import { FaUserEdit } from "react-icons/fa";
 import { LuPlus } from "react-icons/lu";
+import { Badge } from "@/components/ui/badge";
 
 export default function AuthenticationView() {
   const { data: config } = useSWR<FrigateConfig>("config");
@@ -27,7 +28,7 @@ export default function AuthenticationView() {
   const [selectedUser, setSelectedUser] = useState<string>();
 
   useEffect(() => {
-    document.title = "Authentication Settings - Frigate";
+    document.title = "Authentication Settings - InTL Hub";
   }, []);
 
   const onSavePassword = useCallback((user: string, password: string) => {
@@ -56,7 +57,7 @@ export default function AuthenticationView() {
       });
       setShowCreate(false);
       mutateUsers((users) => {
-        users?.push({ username: user });
+        users?.push({ username: user, role: role });
         return users;
       }, false);
     } catch (error) {
@@ -92,7 +93,7 @@ export default function AuthenticationView() {
       <div className="scrollbar-container order-last mb-10 mt-2 flex h-full w-full flex-col overflow-y-auto rounded-lg border-[1px] border-secondary-foreground bg-background_alt p-2 md:order-none md:mb-0 md:mr-2 md:mt-0">
         <div className="flex flex-row items-center justify-between gap-2">
           <Heading as="h3" className="my-2">
-            Users
+            Users and Admins
           </Heading>
           <Button
             className="flex items-center gap-1"
@@ -111,7 +112,10 @@ export default function AuthenticationView() {
             <Card key={u.username} className="mb-1 p-2">
               <div className="flex items-center gap-3">
                 <div className="ml-3 flex flex-none shrink overflow-hidden text-ellipsis align-middle text-lg">
-                  {u.username}
+                  <div className="flex flex-col space-y-1">
+                    <span>{u.username}</span>
+                    <span> <Badge variant={"outline"} >{u.role}</Badge> </span>
+                  </div>
                 </div>
                 <div className="flex flex-1 justify-end space-x-2">
                   <Button

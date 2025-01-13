@@ -42,7 +42,7 @@ export default function CreateUserDialog({
         message: "Username may only include letters, numbers, . or _",
       }),
     password: z.string(),
-    role: z.enum(["User", "Admin"]),
+    role: z.enum(["user", "admin"]),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,12 +51,13 @@ export default function CreateUserDialog({
     defaultValues: {
       user: "",
       password: "",
-      role: "User",
+      role: "user",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+    console.log("Creating User: ", values)
     await onCreate(values.user, values.password, values.role);
     form.reset();
     setIsLoading(false);
@@ -87,20 +88,24 @@ export default function CreateUserDialog({
             />
             <FormField
               name="role"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Roles</FormLabel>
                   <FormControl>
-                    <RadioGroup className="flex flex-row gap-4">
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-row gap-4">
                       <FormItem>
                         <FormControl>
-                          <RadioGroupItem value="User" />
+                          <RadioGroupItem value="user" />
                         </FormControl>
                         <FormLabel>User</FormLabel>
                       </FormItem>
                       <FormItem>
                         <FormControl>
-                          <RadioGroupItem value="Admin" />
+                          <RadioGroupItem value="admin" />
                         </FormControl>
                         <FormLabel>Admin</FormLabel>
                       </FormItem>

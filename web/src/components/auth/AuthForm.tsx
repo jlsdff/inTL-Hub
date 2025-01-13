@@ -20,6 +20,7 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Cookies from "js-cookie";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -54,7 +55,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             "X-CSRF-TOKEN": 1,
           },
         },
-      );
+      )
       window.location.href = baseUrl;
     } catch (error) {
       if (axios.isAxiosError(error)) {

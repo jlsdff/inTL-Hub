@@ -20,12 +20,31 @@ import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import { DialogClose } from "../ui/dialog";
 import { LuLogOut } from "react-icons/lu";
 import useSWR from "swr";
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+
 
 type AccountSettingsProps = {
   className?: string;
 };
+
+const fetcher = (url: string) => {
+  console.log(url)
+  console.log("Bearer " + Cookies.get('frigate_token'))
+  return axios.get(url, {
+    headers: {
+      'Authorization': `Bearer ${Cookies.get('frigate_token')}`
+    }
+  }).then(res => {
+    console.log(res.data)
+    return res.data;
+  });
+}
+
 export default function AccountSettings({ className }: AccountSettingsProps) {
-  const { data: profile } = useSWR("profile");
+  const { data: profile } = useSWR("profile", fetcher);
   const { data: config } = useSWR("config");
   const logoutUrl = config?.proxy?.logout_url || `${baseUrl}api/logout`;
 
@@ -33,6 +52,22 @@ export default function AccountSettings({ className }: AccountSettingsProps) {
   const Trigger = isDesktop ? DropdownMenuTrigger : DrawerTrigger;
   const Content = isDesktop ? DropdownMenuContent : DrawerContent;
   const MenuItem = isDesktop ? DropdownMenuItem : DialogClose;
+
+  const logout = async () => {
+    try {
+      await axios.get(`${baseUrl}api/logout`, {
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('frigate_token')}`
+        }
+      });
+      window.location.href = '/login';
+    } catch (error) {
+      console.error(error);
+      toast.error("Error logging out", {
+        position: "top-center",
+      });
+    }
+  }
 
   return (
     <Container modal={!isDesktop}>
@@ -74,10 +109,10 @@ export default function AccountSettings({ className }: AccountSettingsProps) {
             }
             aria-label="Log out"
           >
-            <a className="flex" href={logoutUrl}>
+            <Button onClick={() => logout()} className="flex" >
               <LuLogOut className="mr-2 size-4" />
               <span>Logout</span>
-            </a>
+            </Button>
           </MenuItem>
         </div>
       </Content>
