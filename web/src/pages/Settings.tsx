@@ -34,8 +34,8 @@ import ObjectSettingsView from "@/views/settings/ObjectSettingsView";
 import MotionTunerView from "@/views/settings/MotionTunerView";
 import MasksAndZonesView from "@/views/settings/MasksAndZonesView";
 import AuthenticationView from "@/views/settings/AuthenticationView";
-import NotificationView from "@/views/settings/NotificationsSettingsView";
-import SearchSettingsView from "@/views/settings/SearchSettingsView";
+// import NotificationView from "@/views/settings/NotificationsSettingsView";
+// import SearchSettingsView from "@/views/settings/SearchSettingsView";
 import UiSettingsView from "@/views/settings/UiSettingsView";
 import AuditLogsView from "@/views/settings/AuditLogsView";
 
