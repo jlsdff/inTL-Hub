@@ -17,14 +17,14 @@ def main() -> None:
     # Setup the logging thread
     setup_logging()
 
-    threading.current_thread().name = "frigate"
+    threading.current_thread().name = "InTL Hub Main Thread"
 
     # Make sure we exit cleanly on SIGTERM.
     signal.signal(signal.SIGTERM, lambda sig, frame: sys.exit())
 
     # Parse the cli arguments.
     parser = argparse.ArgumentParser(
-        prog="Frigate",
+        prog="InTL Hub",
         description="An NVR with realtime local object detection for IP cameras.",
     )
     parser.add_argument("--validate-config", action="store_true")

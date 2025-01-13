@@ -1,8 +1,10 @@
 from peewee import (
+    AutoField,
     BooleanField,
     CharField,
     DateTimeField,
     FloatField,
+    ForeignKeyField,
     IntegerField,
     Model,
     TextField,
@@ -123,7 +125,8 @@ class User(Model):  # type: ignore[misc]
 
 
 class Audits(Model):
-    user = TextField()
-    action = CharField(null=True, max_length=50)
-    description = TextField()
+    id = AutoField(primary_key=True)
+    event_type = CharField()
+    description = CharField(null=True)  # Optional field
     timestamp = DateTimeField()
+    user_id = ForeignKeyField(User, backref="audits", field="username")
