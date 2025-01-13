@@ -27,7 +27,7 @@ from frigate.api.defs.request.app_body import (
 from frigate.api.defs.tags import Tags
 from frigate.config import AuthConfig, ProxyConfig
 from frigate.const import CONFIG_DIR, JWT_SECRET_ENV_VAR, PASSWORD_HASH_ALGORITHM
-from frigate.models import User
+from frigate.models import Audits, User
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +180,7 @@ def set_jwt_cookie(response: Response, cookie_name, encoded_jwt, expiration, sec
     response.set_cookie(
         key=cookie_name,
         value=encoded_jwt,
-        httponly=True,
+        httponly=False,
         expires=expiration,
         secure=secure,
     )
@@ -324,22 +324,32 @@ def get_current_user(request: Request, user: str = Depends(currentUser)):
     current = User.get(User.username == user)
     user_data = {"username": current.username, "role": current.role}
     print(f"current: {user_data}")
-    return JSONResponse(content={"username": user})
+    return JSONResponse(content=user_data)
 
 
 @router.get("/profile")
-def profile(request: Request):
-    username = request.headers.get("user")
-    print(f"headers: {request.headers}")
-    print(f"Received remote-user header: {username}")
-    return JSONResponse(content={"username": username})
+def profile(request: Request, user: str = Depends(currentUser)):
+    # username = request.headers.get("remote-user")
+    current = User.get(User.username == user)
+    user_data = {"username": current.username, "role": current.role}
+    # print(f"headers: {request.headers}")
+    # print(f"Received remote-user header: {username}")
+    return JSONResponse(content=user_data)
 
 
 @router.get("/logout")
-def logout(request: Request):
+def logout(request: Request, user: str = Depends(currentUser)):
     auth_config: AuthConfig = request.app.frigate_config.auth
     response = RedirectResponse("/login", status_code=303)
     response.delete_cookie(auth_config.cookie_name)
+    Audits.insert(
+        {
+            Audits.event_type: "logout",
+            Audits.description: f"{user} logged out",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return response
 
 
@@ -368,6 +378,14 @@ def login(request: Request, body: AppPostLoginBody):
         set_jwt_cookie(
             response, JWT_COOKIE_NAME, encoded_jwt, expiration, JWT_COOKIE_SECURE
         )
+        Audits.insert(
+            {
+                Audits.event_type: "login",
+                Audits.description: f"{user} logged in",
+                Audits.user_id: user,
+                Audits.timestamp: int(time.time()),
+            }
+        ).execute()
         return response
     return JSONResponse(content={"message": "Login failed"}, status_code=401)
 
@@ -375,14 +393,16 @@ def login(request: Request, body: AppPostLoginBody):
 @router.get("/users")
 def get_users():
     exports = (
-        User.select(User.username, User.role).order_by(User.username).dicts().iterator()
+        User.select(User.username, User.role).order_by(User.role).dicts().iterator()
     )
     # exports = User.select(User.username).order_by(User.username).dicts().iterator()
     return JSONResponse([e for e in exports])
 
 
 @router.post("/users")
-def create_user(request: Request, body: AppPostUsersBody):
+def create_user(
+    request: Request, body: AppPostUsersBody, user: str = Depends(currentUser)
+):
     HASH_ITERATIONS = request.app.frigate_config.auth.hash_iterations
 
     if not re.match("^[A-Za-z0-9._]+$", body.username):
@@ -401,17 +421,39 @@ def create_user(request: Request, body: AppPostUsersBody):
             User.notification_tokens: [],
         }
     ).execute()
+
+    Audits.insert(
+        {
+            Audits.event_type: "Create User",
+            Audits.description: f"{user} created user {body.username}",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return JSONResponse(content={"username": body.username, "role": body.role})
 
 
 @router.delete("/users/{username}")
-def delete_user(username: str):
+def delete_user(username: str, user: str = Depends(currentUser)):
     User.delete_by_id(username)
+    Audits.insert(
+        {
+            Audits.event_type: "Delete User",
+            Audits.description: f"{user} deleted user {username}",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return JSONResponse(content={"success": True})
 
 
 @router.put("/users/{username}/password")
-def update_password(request: Request, username: str, body: AppPutPasswordBody):
+def update_password(
+    request: Request,
+    username: str,
+    body: AppPutPasswordBody,
+    user: str = Depends(currentUser),
+):
     HASH_ITERATIONS = request.app.frigate_config.auth.hash_iterations
 
     password_hash = hash_password(body.password, iterations=HASH_ITERATIONS)
@@ -422,4 +464,12 @@ def update_password(request: Request, username: str, body: AppPutPasswordBody):
             User.password_hash: password_hash,
         },
     )
+    Audits.insert(
+        {
+            Audits.event_type: "Update Password",
+            Audits.description: f"{user} updated password for user {username}",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return JSONResponse(content={"success": True})
