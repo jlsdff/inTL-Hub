@@ -3,18 +3,21 @@
 import logging
 import random
 import string
+import time
 from pathlib import Path
 
 import psutil
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer
 from peewee import DoesNotExist
 from playhouse.shortcuts import model_to_dict
 
+from frigate.api.auth import currentUser
 from frigate.api.defs.request.export_recordings_body import ExportRecordingsBody
 from frigate.api.defs.tags import Tags
 from frigate.const import EXPORT_DIR
-from frigate.models import Export, Previews, Recordings
+from frigate.models import Audits, Export, Previews, Recordings
 from frigate.record.export import (
     PlaybackFactorEnum,
     PlaybackSourceEnum,
@@ -25,6 +28,7 @@ from frigate.util.builtin import is_current_hour
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=[Tags.export])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @router.get("/exports")
@@ -40,6 +44,7 @@ def export_recording(
     start_time: float,
     end_time: float,
     body: ExportRecordingsBody,
+    user: str = Depends(currentUser),
 ):
     if not camera_name or not request.app.frigate_config.cameras.get(camera_name):
         return JSONResponse(
@@ -117,6 +122,14 @@ def export_recording(
         ),
     )
     exporter.start()
+    Audits.insert(
+        {
+            Audits.event_type: "Export",
+            Audits.description: f"{user} created an export for {camera_name}",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return JSONResponse(
         content=(
             {
@@ -130,7 +143,7 @@ def export_recording(
 
 
 @router.patch("/export/{event_id}/{new_name}")
-def export_rename(event_id: str, new_name: str):
+def export_rename(event_id: str, new_name: str, user: str = Depends(currentUser)):
     try:
         export: Export = Export.get(Export.id == event_id)
     except DoesNotExist:
@@ -146,6 +159,14 @@ def export_rename(event_id: str, new_name: str):
 
     export.name = new_name
     export.save()
+    Audits.insert(
+        {
+            Audits.event_type: "Rename Export",
+            Audits.description: f"Renamed export to {new_name}",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return JSONResponse(
         content=(
             {
@@ -158,7 +179,7 @@ def export_rename(event_id: str, new_name: str):
 
 
 @router.delete("/export/{event_id}")
-def export_delete(event_id: str):
+def export_delete(event_id: str, user: str = Depends(currentUser)):
     try:
         export: Export = Export.get(Export.id == event_id)
     except DoesNotExist:
@@ -199,6 +220,14 @@ def export_delete(event_id: str):
         Path(export.thumb_path).unlink(missing_ok=True)
 
     export.delete_instance()
+    Audits.insert(
+        {
+            Audits.event_type: "Delete Export",
+            Audits.description: "Deleted export",
+            Audits.user_id: user,
+            Audits.timestamp: int(time.time()),
+        }
+    ).execute()
     return JSONResponse(
         content=(
             {
