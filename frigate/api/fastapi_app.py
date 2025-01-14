@@ -11,7 +11,16 @@ from starlette_context import middleware, plugins
 from starlette_context.plugins import Plugin
 
 from frigate.api import app as main_app
-from frigate.api import auth, event, export, media, notification, preview, review
+from frigate.api import (
+    audits,
+    auth,
+    event,
+    export,
+    media,
+    notification,
+    preview,
+    review,
+)
 from frigate.api.auth import get_jwt_secret, limiter
 from frigate.comms.event_metadata_updater import (
     EventMetadataPublisher,
@@ -98,6 +107,7 @@ def create_fastapi_app(
 
     # Routes
     # Order of include_router matters: https://fastapi.tiangolo.com/tutorial/path-params/#order-matters
+    app.include_router(audits.router)
     app.include_router(auth.router)
     app.include_router(review.router)
     app.include_router(main_app.router)
@@ -106,6 +116,7 @@ def create_fastapi_app(
     app.include_router(export.router)
     app.include_router(event.router)
     app.include_router(media.router)
+
     # App Properties
     app.frigate_config = frigate_config
     app.embeddings = embeddings

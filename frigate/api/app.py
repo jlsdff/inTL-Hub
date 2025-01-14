@@ -4,6 +4,7 @@ import copy
 import json
 import logging
 import os
+import time
 import traceback
 from datetime import datetime, timedelta
 from functools import reduce
@@ -17,11 +18,12 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from markupsafe import escape
 from peewee import operator
 
+from frigate.api.auth import currentUser
 from frigate.api.defs.query.app_query_parameters import AppTimelineHourlyQueryParameters
 from frigate.api.defs.request.app_body import AppConfigSetBody
 from frigate.api.defs.tags import Tags
 from frigate.config import FrigateConfig
-from frigate.models import Event, Timeline
+from frigate.models import Audits, Event, Timeline
 from frigate.util.builtin import (
     clean_camera_user_pass,
     get_tz_modifiers,
@@ -183,7 +185,11 @@ def config_raw():
 
 
 @router.post("/config/save")
-def config_save(save_option: str, body: Any = Body(media_type="text/plain")):
+def config_save(
+    save_option: str,
+    body: Any = Body(media_type="text/plain"),
+    user: str = Depends(currentUser),
+):
     new_config = body.decode()
 
     if not new_config:
@@ -240,7 +246,14 @@ def config_save(save_option: str, body: Any = Body(media_type="text/plain")):
                 ),
                 status_code=200,
             )
-
+        Audits.insert(
+            {
+                Audits.event_type: "Save Config",
+                Audits.description: f"{user} saved and applied config",
+                Audits.user_id: user,
+                Audits.timestamp: int(time.time()),
+            }
+        ).execute()
         return JSONResponse(
             content=(
                 {
@@ -251,6 +264,14 @@ def config_save(save_option: str, body: Any = Body(media_type="text/plain")):
             status_code=200,
         )
     else:
+        Audits.insert(
+            {
+                Audits.event_type: "Save Config",
+                Audits.description: f"{user} saved and applied config",
+                Audits.user_id: user,
+                Audits.timestamp: int(datetime.now().timestamp()),
+            }
+        )
         return JSONResponse(
             content=({"success": True, "message": "Config successfully saved."}),
             status_code=200,
