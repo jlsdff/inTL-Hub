@@ -1,10 +1,8 @@
 import {
   LuActivity,
-  LuList,
   LuLogOut,
   LuMoon,
   LuPenSquare,
-  LuRotateCw,
   LuSettings,
   LuSun,
   LuSunMoon,
@@ -159,7 +157,7 @@ export default function GeneralSettings({ className }: GeneralSettingsProps) {
                   <span>System metrics</span>
                 </MenuItem>
               </Link>
-              
+
             </DropdownMenuGroup>
             {
               profile?.role === 'admin' && (
