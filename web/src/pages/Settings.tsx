@@ -18,7 +18,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useContext } from "react";
 import useOptimisticState from "@/hooks/use-optimistic-state";
 import { isMobile } from "react-device-detect";
 import { FaVideo } from "react-icons/fa";
@@ -34,10 +34,9 @@ import ObjectSettingsView from "@/views/settings/ObjectSettingsView";
 import MotionTunerView from "@/views/settings/MotionTunerView";
 import MasksAndZonesView from "@/views/settings/MasksAndZonesView";
 import AuthenticationView from "@/views/settings/AuthenticationView";
-// import NotificationView from "@/views/settings/NotificationsSettingsView";
-// import SearchSettingsView from "@/views/settings/SearchSettingsView";
 import UiSettingsView from "@/views/settings/UiSettingsView";
 import AuditLogsView from "@/views/settings/AuditLogsView";
+import { PermissionContext } from "@/context/permissions";
 
 const allSettingsViews = [
   "UI settings",
@@ -51,6 +50,7 @@ const allSettingsViews = [
 type SettingsType = (typeof allSettingsViews)[number];
 
 export default function Settings() {
+  const { profile } = useContext(PermissionContext);
   const [page, setPage] = useState<SettingsType>("UI settings");
   const [pageToggle, setPageToggle] = useOptimisticState(page, setPage, 100);
   const tabsRef = useRef<HTMLDivElement | null>(null);
@@ -58,17 +58,19 @@ export default function Settings() {
   const { data: config } = useSWR<FrigateConfig>("config");
 
   // available settings views
-
   const settingsViews = useMemo(() => {
     const views = [...allSettingsViews];
 
-    // if (!("Notification" in window) || !window.isSecureContext) {
-    //   const index = views.indexOf("notifications");
-    //   views.splice(index, 1);
-    // }
+    if (profile?.role !== 'admin') {
+      const indexUsers = views.indexOf("users");
+      if (indexUsers > -1) views.splice(indexUsers, 1);
+
+      const indexAuditLogs = views.indexOf("audit logs");
+      if (indexAuditLogs > -1) views.splice(indexAuditLogs, 1);
+    }
 
     return views;
-  }, []);
+  }, [profile]);
 
   // TODO: confirm leave page
   const [unsavedChanges, setUnsavedChanges] = useState(false);
@@ -241,7 +243,7 @@ function CameraSelectButton({
   const [open, setOpen] = useState(false);
 
   if (!allCameras.length) {
-    return;
+    return null;
   }
 
   const trigger = (

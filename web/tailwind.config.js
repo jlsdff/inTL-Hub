@@ -22,7 +22,7 @@ module.exports = {
   	},
   	fontFamily: {
   		sans: [
-  			'Inter"',
+  			'Inter',
   			'sans-serif'
   		]
   	},
