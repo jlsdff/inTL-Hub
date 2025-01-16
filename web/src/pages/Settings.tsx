@@ -43,7 +43,7 @@ const allSettingsViews = [
   "camera settings",
   "masks / zones",
   "motion tuner",
-  "debug",
+  "Ai Preview",
   "users",
   "audit logs",
 ] as const;
@@ -156,7 +156,7 @@ export default function Settings() {
             <ScrollBar orientation="horizontal" className="h-0" />
           </div>
         </ScrollArea>
-        {(page == "debug" ||
+        {(page == "Ai Preview" ||
           page == "camera settings" ||
           page == "masks / zones" ||
           page == "motion tuner") && (
@@ -177,7 +177,7 @@ export default function Settings() {
       </div>
       <div className="mt-2 flex h-full w-full flex-col items-start md:h-dvh md:pb-24">
         {page == "UI settings" && <UiSettingsView />}
-        {page == "debug" && (
+        {page == "Ai Preview" && (
           <ObjectSettingsView selectedCamera={selectedCamera} />
         )}
         {page == "camera settings" && (

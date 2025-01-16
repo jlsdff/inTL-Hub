@@ -187,19 +187,6 @@ export default function GeneralSettings({ className }: GeneralSettingsProps) {
                       <span>Settings</span>
                     </MenuItem>
                   </Link>
-                  <Link to="/config">
-                    <MenuItem
-                      className={
-                        isDesktop
-                          ? "cursor-pointer"
-                          : "flex w-full items-center p-2 text-sm"
-                      }
-                      aria-label="Configuration editor"
-                    >
-                      <LuPenSquare className="mr-2 size-4" />
-                      <span>Configuration editor</span>
-                    </MenuItem>
-                  </Link>
                 </>
               )}
             </DropdownMenuGroup>

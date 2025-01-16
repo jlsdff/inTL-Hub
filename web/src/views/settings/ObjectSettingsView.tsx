@@ -156,7 +156,7 @@ export default function ObjectSettingsView({
   }, [options, optionsLoaded]);
 
   useEffect(() => {
-    document.title = "Object Settings - Frigate";
+    document.title = "Object Settings - InTl Hub";
   }, []);
 
   if (!cameraConfig) {
@@ -168,11 +168,11 @@ export default function ObjectSettingsView({
       <Toaster position="top-center" closeButton={true} />
       <div className="scrollbar-container order-last mb-10 mt-2 flex h-full w-full flex-col overflow-y-auto rounded-lg border-[1px] border-secondary-foreground bg-background_alt p-2 md:order-none md:mb-0 md:mr-2 md:mt-0 md:w-3/12">
         <Heading as="h3" className="my-2">
-          Debug
+          Ai Preview
         </Heading>
         <div className="mb-5 space-y-3 text-sm text-muted-foreground">
           <p>
-            Frigate uses your detectors{" "}
+            InTL Hub uses your detectors{" "}
             {config
               ? "(" +
                 Object.keys(config?.detectors)
@@ -206,7 +206,7 @@ export default function ObjectSettingsView({
 
         <Tabs defaultValue="debug" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="debug">Debugging</TabsTrigger>
+            <TabsTrigger value="debug">Ai Preview</TabsTrigger>
             <TabsTrigger value="objectlist">Object List</TabsTrigger>
           </TabsList>
           <TabsContent value="debug">
