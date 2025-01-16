@@ -347,7 +347,7 @@ def logout(request: Request, user: str = Depends(currentUser)):
             Audits.event_type: "logout",
             Audits.description: f"{user} logged out",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.timestamp(),
         }
     ).execute()
     return response
@@ -383,7 +383,7 @@ def login(request: Request, body: AppPostLoginBody):
                 Audits.event_type: "login",
                 Audits.description: f"{user} logged in",
                 Audits.user_id: user,
-                Audits.timestamp: int(time.time()),
+                Audits.timestamp: datetime.datetime.now(),
             }
         ).execute()
         return response
@@ -427,7 +427,7 @@ def create_user(
             Audits.event_type: "Create User",
             Audits.description: f"{user} created user {body.username}",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.now(),
         }
     ).execute()
     return JSONResponse(content={"username": body.username, "role": body.role})
@@ -441,7 +441,7 @@ def delete_user(username: str, user: str = Depends(currentUser)):
             Audits.event_type: "Delete User",
             Audits.description: f"{user} deleted user {username}",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.now()
         }
     ).execute()
     return JSONResponse(content={"success": True})
@@ -469,7 +469,7 @@ def update_password(
             Audits.event_type: "Update Password",
             Audits.description: f"{user} updated password for user {username}",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.now()
         }
     ).execute()
     return JSONResponse(content={"success": True})

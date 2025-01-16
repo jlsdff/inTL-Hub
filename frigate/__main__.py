@@ -38,7 +38,6 @@ def main() -> None:
         print("*************************************************************")
         print("***    Your config file is not valid!                     ***")
         print("***    Please check the docs at                           ***")
-        print("***    https://docs.frigate.video/configuration/          ***")
         print("*************************************************************")
         print("*************************************************************")
         print("***    Config Validation Errors                           ***")

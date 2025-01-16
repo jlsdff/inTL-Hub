@@ -543,7 +543,7 @@ class FrigateApp:
     def init_auth(self) -> None:
         if self.config.auth.enabled:
             if User.select().count() == 0:
-                password = secrets.token_hex(16)
+                password = "intlhub"
                 password_hash = hash_password(
                     password, iterations=self.config.auth.hash_iterations
                 )
@@ -552,6 +552,7 @@ class FrigateApp:
                         User.username: "admin",
                         User.password_hash: password_hash,
                         User.notification_tokens: [],
+                        User.role: "admin",
                     }
                 ).execute()
 
@@ -572,6 +573,7 @@ class FrigateApp:
                     username="admin",
                     password_hash=password_hash,
                     notification_tokens=[],
+                    role="admin",
                 ).execute()
 
                 logger.info("********************************************************")
@@ -582,7 +584,7 @@ class FrigateApp:
                 logger.info("********************************************************")
 
     def start(self) -> None:
-        logger.info(f"Starting Frigate ({VERSION})")
+        logger.info(f"Starting intlhub ({VERSION})")
 
         # Ensure global state.
         self.ensure_dirs()

@@ -36,9 +36,9 @@ export default function AuditLogsView({}) {
               <div>
                 <span>
                   {audit.timestamp
-                    ? new Date(audit.timestamp).toLocaleDateString("en-us", {
+                    ? new Date(audit.timestamp).toLocaleString("en-US", {
                         year: "numeric",
-                        month: "long",
+                        month: "long",       
                         day: "numeric",
                         hour: "numeric",
                         minute: "numeric",

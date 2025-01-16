@@ -127,7 +127,7 @@ def export_recording(
             Audits.event_type: "Export",
             Audits.description: f"{user} created an export for {camera_name}",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.now(),
         }
     ).execute()
     return JSONResponse(
@@ -164,7 +164,7 @@ def export_rename(event_id: str, new_name: str, user: str = Depends(currentUser)
             Audits.event_type: "Rename Export",
             Audits.description: f"Renamed export to {new_name}",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.now()
         }
     ).execute()
     return JSONResponse(
@@ -225,7 +225,7 @@ def export_delete(event_id: str, user: str = Depends(currentUser)):
             Audits.event_type: "Delete Export",
             Audits.description: "Deleted export",
             Audits.user_id: user,
-            Audits.timestamp: int(time.time()),
+            Audits.timestamp: datetime.datetime.now()
         }
     ).execute()
     return JSONResponse(

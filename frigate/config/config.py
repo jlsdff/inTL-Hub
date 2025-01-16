@@ -639,7 +639,7 @@ class FrigateConfig(FrigateBaseModel):
     @classmethod
     def load(cls, **kwargs):
         config_path = find_config_file()
-
+        print("Tang ina mo")
         # No configuration file found, create one.
         new_config = False
         if not os.path.isfile(config_path):

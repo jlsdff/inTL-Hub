@@ -18,10 +18,13 @@ DEFAULT_CONFIG_FILE = "/config/config.yml"
 
 
 def find_config_file() -> str:
+    print("Finding config file...")
     config_path = os.environ.get("CONFIG_FILE", DEFAULT_CONFIG_FILE)
+    print(f"Initial config path: {config_path}")
 
     if not os.path.isfile(config_path):
         config_path = config_path.replace("yml", "yaml")
+        print(f"Updated config path to: {config_path}")
 
     return config_path
 

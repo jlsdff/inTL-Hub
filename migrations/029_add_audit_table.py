@@ -15,7 +15,7 @@ def migrate(migrator: Migrator, database: pw.Database, *, fake=False):
     migrator.sql(
         """
         CREATE TABLE audits (
-    id INT PRIMARY KEY AUTO INCREMENT,
+    id SERIAL PRIMARY KEY,
     event_type VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     timestamp TIMESTAMP NOT NULL,
